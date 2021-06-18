@@ -3,18 +3,11 @@ package com.order.orderdemo.dao.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "USER_DETAILS")
-@NamedQueries({
-		@NamedQuery(name = UserDetails.NAMED_QUERY_EXECUTE_AUTHENTICATE, query = "select e from UserDetails e where e.userName=:userName and e.password=:password") })
 public class UserDetails {
-
-	public static final String NAMED_QUERY_EXECUTE_AUTHENTICATE = "UserDetails.authenticate";
-
 	@Id
 	@Column(name = "id")
 	private String id;
