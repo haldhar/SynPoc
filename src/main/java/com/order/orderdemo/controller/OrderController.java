@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
 
+import com.order.orderdemo.email.EmailService;
+import com.order.orderdemo.email.model.ConfirmationEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,9 @@ public class OrderController {
 	@Autowired
 	OrderProductService orderProductService;
 
+	@Autowired
+	EmailService emailService;
+
 	@PostMapping(path = "/order")
 	public ResponseEntity<Order> create(@RequestBody OrderForm orderForm) {
 		List<OrderProduct> formData = orderForm.getProductOrders();
@@ -53,6 +58,7 @@ public class OrderController {
 		order.setOrderProducts(orderProducts);
 
 		orderService.update(order);
+		emailService.sendEmail(orderForm.getConfirmationEmail());
 
 		var uri = ServletUriComponentsBuilder.fromCurrentServletMapping().path("/orders/{id}")
 				.buildAndExpand(order.getId()).toString();
@@ -76,12 +82,22 @@ public class OrderController {
 
 		private List<OrderProduct> productOrders;
 
+		private ConfirmationEmail confirmationEmail;
+
 		public List<OrderProduct> getProductOrders() {
 			return productOrders;
 		}
 
 		public void setProductOrders(List<OrderProduct> productOrders) {
 			this.productOrders = productOrders;
+		}
+
+		public ConfirmationEmail getConfirmationEmail() {
+			return confirmationEmail;
+		}
+
+		public void setConfirmationEmail(ConfirmationEmail confirmationEmail) {
+			this.confirmationEmail = confirmationEmail;
 		}
 	}
 }
