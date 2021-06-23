@@ -20,12 +20,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-
 	private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
 	private static final long serialVersionUID = -3301605591108950415L;
 
 	static final String CLAIM_KEY_USERNAME = "sub";
-	static final String CLAIM_KEY_CREATED = "create";
+	static final String CLAIM_KEY_CREATED = "created";
 
 	@Value("${jwt.secret}")
 	private String fileName;
@@ -35,48 +34,16 @@ public class JwtTokenUtil implements Serializable {
 	@Value("${jwt.expiration}")
 	private Long expiration;
 
-	public String generateToken(String userName) {
-		Map<String, Object> claims = new HashMap<>();
-		claims.put(CLAIM_KEY_CREATED, new Date());
-		claims.put(CLAIM_KEY_USERNAME, userName);
-		return generateToken(claims);
-
-	}
-
-	private String generateToken(Map<String, Object> claims) {
-		readPublicKey();
-		return Jwts.builder().setClaims(claims).setExpiration(generateExpirationDate())
-				.signWith(SignatureAlgorithm.HS512, publicKey).compact();
-	}
-
 	/**
-	 * Generate expire date of token by adding expiration property.
+	 * Generate token.
 	 * 
 	 * @return
 	 */
-
-	private Date generateExpirationDate() {
-		return new Date(System.currentTimeMillis() + expiration * 1000);
-	}
-
-	private void readPublicKey() {
-		if (publicKey == null) {
-			var fileContent = new StringBuilder();
-			try {
-				var classPathResource = new ClassPathResource(fileName);
-				var inputStream = classPathResource.getInputStream();
-				var bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-				String currentLine;
-				while ((currentLine = bufferedReader.readLine()) != null) {
-					fileContent.append(currentLine);
-				}
-				bufferedReader.close();
-
-			} catch (IOException e) {
-				logger.error("IOException in getFileContent", e);
-			}
-			publicKey = fileContent.toString();
-		}
+	public String generateToken(String userName) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put(CLAIM_KEY_USERNAME, userName);
+		claims.put(CLAIM_KEY_CREATED, new Date());
+		return generateToken(claims);
 	}
 
 	/**
@@ -88,11 +55,52 @@ public class JwtTokenUtil implements Serializable {
 
 	public Boolean validateToken(String token) {
 		try {
-			final String username = getUsernameFromToken(token);
-			return (username != null && !isTokenExpired(token));
+			final String username = getUsernameFromToken(token);			
+			return (username!=null && !isTokenExpired(token));
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Read file and assign for public key.
+	 */
+	private void readPublicKey() {
+		if (publicKey == null) {
+			var fileContent = new StringBuilder();
+			try {
+				
+				var classPathResource = new ClassPathResource(fileName);
+				var inputStream = classPathResource.getInputStream();
+				var br = new BufferedReader(new InputStreamReader(inputStream));
+				String currentLine;
+				while ((currentLine = br.readLine()) != null) {
+					fileContent.append(currentLine);
+				}
+				br.close();
+
+			} catch (IOException e) {
+				logger.error("IOException in getFileContent", e);
+			}
+			publicKey = fileContent.toString();
+		}
+	}
+
+	/**
+	 * Return username from token.
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public String getUsernameFromToken(String token) {
+		String username;
+		try {
+			final var claims = getClaimsFromToken(token);
+			username = claims.getSubject();
+		} catch (Exception e) {
+			username = null;
+		}
+		return username;
 	}
 
 	/**
@@ -103,51 +111,14 @@ public class JwtTokenUtil implements Serializable {
 	 */
 
 	private Date getExpirationDateFromToken(String token) {
-		Date expire = null;
+		Date expire;
 		try {
 			final var claims = getClaimsFromToken(token);
-			if (null != claims) {
-				expire = claims.getExpiration();
-			}
+			expire = claims.getExpiration();
 		} catch (Exception e) {
-			logger.error("Error during getExpirationDateFromToken", e);
+			expire = null;
 		}
 		return expire;
-	}
-
-	/**
-	 * Return true if token expired.
-	 * 
-	 * @param token
-	 * @return
-	 */
-	private Boolean isTokenExpired(String token) {
-		final var expire = getExpirationDateFromToken(token);
-		if (null != expire) {
-			return expire.before(new Date());
-		} else {
-			return false;
-		}
-
-	}
-
-	/**
-	 * Return userName from token.
-	 * 
-	 * @param token
-	 * @return
-	 */
-	public String getUsernameFromToken(String token) {
-		String username = null;
-		try {
-			final var claims = getClaimsFromToken(token);
-			if (null != claims) {
-				username = claims.getSubject();
-			}
-		} catch (Exception e) {
-			return null;
-		}
-		return username;
 	}
 
 	private Claims getClaimsFromToken(String token) {
@@ -159,6 +130,40 @@ public class JwtTokenUtil implements Serializable {
 			claims = null;
 		}
 		return claims;
+	}
+
+	/**
+	 * Generate expiry date of token by adding expiration property.
+	 * 
+	 * @return
+	 */
+
+	private Date generateExpirationDate() {
+		return new Date(System.currentTimeMillis() + expiration * 1000);
+	}
+
+	/**
+	 * Return true if token expired.
+	 * 
+	 * @param token
+	 * @return
+	 */
+
+	private Boolean isTokenExpired(String token) {
+		final var expire = getExpirationDateFromToken(token);
+		return expire.before(new Date());
+	}
+
+	/**
+	 * Generate token with expiry date and secrete key.
+	 * 
+	 * @param claims
+	 * @return
+	 */
+	private String generateToken(Map<String, Object> claims) {
+		readPublicKey();
+		return Jwts.builder().setClaims(claims).setExpiration(generateExpirationDate())
+				.signWith(SignatureAlgorithm.HS512, publicKey).compact();
 	}
 
 }

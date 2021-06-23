@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class JwtUser implements UserDetails {
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 4501605591108950415L;
 	private String username;
 
@@ -20,6 +23,7 @@ public class JwtUser implements UserDetails {
 	public String getUsername() {
 		return username;
 	}
+
 
 	@JsonIgnore
 	@Override
@@ -56,4 +60,5 @@ public class JwtUser implements UserDetails {
 	public String getPassword() {
 		return null;
 	}
+
 }

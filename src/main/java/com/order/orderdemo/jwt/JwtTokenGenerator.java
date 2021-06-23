@@ -8,7 +8,7 @@ public class JwtTokenGenerator {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 
-	public String generateToken(String userName) {
+	public String generateToken(String userName) {	
 		// Reload password post-security so we can generate token
 		return jwtTokenUtil.generateToken(userName);
 	}

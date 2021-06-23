@@ -1,7 +1,5 @@
 package com.order.orderdemo.jwt;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -31,6 +30,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private JwtAuthenticationEntryPoint unauthorizedHandler;
 
 	@Autowired
+	private UserDetailsService userDetailsService;
+
+	@Autowired
 	private AuthenticationProperties authenticationProperties;
 
 	@Autowired
@@ -38,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-		authenticationManagerBuilder.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
+		authenticationManagerBuilder.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
 	}
 
 	@Bean
@@ -50,11 +52,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
-	}
-	
-	@Bean
-	public UserDetailsService userDetailsService() {
-	    return super.userDetailsService();
 	}
 
 	@Override
@@ -71,7 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		addPermitAll(httpSecurity);
 
 		// Custom JWT based security filter
-		JwtAuthenticationTokenFilter authenticationTokenFilter = new JwtAuthenticationTokenFilter(userDetailsService(),
+		var authenticationTokenFilter = new JwtAuthenticationTokenFilter(userDetailsService(),
 				jwtTokenUtil, tokenHeader);
 		httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -90,4 +87,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		urlRegistry.antMatchers(HttpMethod.OPTIONS, "/**").permitAll();
 		urlRegistry.anyRequest().authenticated();
 	}
+
 }

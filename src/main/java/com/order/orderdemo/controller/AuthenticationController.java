@@ -20,9 +20,9 @@ public class AuthenticationController {
 	AuthenticationService authenticationService;
 
 	@PostMapping(path = "/authenticate")
-	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
+	public ResponseEntity<AuthenticationResponse> authenticate(
+			@RequestBody AuthenticationRequest authenticationRequest) {
 		var authenticationResponse = authenticationService.authenticate(authenticationRequest);
 		return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
 	}
-
 }

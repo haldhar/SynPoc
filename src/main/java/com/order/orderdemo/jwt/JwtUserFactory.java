@@ -1,6 +1,7 @@
 package com.order.orderdemo.jwt;
 
 public final class JwtUserFactory {
+
 	private JwtUserFactory() {
 	}
 

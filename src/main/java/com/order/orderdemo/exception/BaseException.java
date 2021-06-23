@@ -1,9 +1,5 @@
 package com.order.orderdemo.exception;
 
-/**
- * @author Haldhar.Seth
- *
- */
 public class BaseException extends RuntimeException {
 
 	/**

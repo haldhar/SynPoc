@@ -12,6 +12,7 @@ import com.order.orderdemo.jwt.JwtTokenGenerator;
 import com.order.orderdemo.model.ResultCode;
 import com.order.orderdemo.service.AuthenticationService;
 
+
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 

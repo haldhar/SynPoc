@@ -1,7 +1,5 @@
 package com.order.orderdemo.email.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,8 +35,6 @@ public class MailConfiguration {
 	@Value("${spring.activemq.password}")
 	private String activemqPassword;
 
-	private static final Logger logger = LoggerFactory.getLogger(MailConfiguration.class);
-
 	@Bean
 	public EmailService emailService() {
 		return new EmailService(getJavaMailSender());
@@ -46,7 +42,6 @@ public class MailConfiguration {
 
 	@Bean
 	public JavaMailSender getJavaMailSender() {
-		logger.info("Mail properties : [emailHost:" + emailHost + ", port:" + emailPort + ", username:" + emailUserName	+ "]");
 		var javaMailSender = new JavaMailSenderImpl();
 		javaMailSender.setProtocol("smtp");
 		javaMailSender.setHost(emailHost);
