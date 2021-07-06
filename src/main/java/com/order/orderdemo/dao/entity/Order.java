@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
@@ -32,7 +33,7 @@ public class Order implements Serializable{
     private LocalDate dateCreated;
 
     private String status;
-
+ 
     @OneToMany(mappedBy = "pk.order")
     private List<OrderProduct> orderProducts = new ArrayList<>();
 

@@ -7,25 +7,30 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
 
-import com.order.orderdemo.email.EmailService;
-import com.order.orderdemo.email.model.ConfirmationEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.order.orderdemo.controller.model.OrderProductResponse;
 import com.order.orderdemo.dao.entity.Order;
 import com.order.orderdemo.dao.entity.OrderProduct;
 import com.order.orderdemo.dao.entity.OrderStatus;
+import com.order.orderdemo.dao.entity.Product;
+import com.order.orderdemo.email.EmailService;
+import com.order.orderdemo.email.model.ConfirmationEmail;
 import com.order.orderdemo.service.OrderProductService;
 import com.order.orderdemo.service.OrderService;
 import com.order.orderdemo.service.ProductService;
 
+@CrossOrigin
 @RestController
 public class OrderController {
 
@@ -51,8 +56,8 @@ public class OrderController {
 
 		List<OrderProduct> orderProducts = new ArrayList<>();
 		for (OrderProduct orderProduct : formData) {
-			orderProducts.add(orderProductService.create(
-					new OrderProduct(order, productService.getProduct(orderProduct.getProduct().getId()), orderProduct.getQuantity())));
+			orderProducts.add(orderProductService.create(new OrderProduct(order,
+					productService.getProduct(orderProduct.getProduct().getId()), orderProduct.getQuantity())));
 		}
 
 		order.setOrderProducts(orderProducts);
@@ -76,6 +81,25 @@ public class OrderController {
 		if (!CollectionUtils.isEmpty(list)) {
 			throw new EntityExistsException("Product already Exists");
 		}
+	}
+
+	@GetMapping(path = "/order")
+	public List<OrderProductResponse> getAllOrders() {
+		Iterable<Order> orders = orderService.getAllOrders();
+		List<OrderProductResponse> orderProductResponseList = new ArrayList<OrderProductResponse>();
+		for (Order order : orders) {
+			OrderProductResponse orderProductResponse = new OrderProductResponse();
+			orderProductResponse.setId(order.getId());
+			orderProductResponse.setDateCreated(order.getDateCreated());
+			orderProductResponse.setStatus(order.getStatus());
+			List<OrderProduct> orderProducts = order.getOrderProducts();
+			for(OrderProduct orderProduct :orderProducts) {
+				orderProductResponse.setTotalPrice(orderProduct.getTotalPrice());
+			}
+			orderProductResponseList.add(orderProductResponse);
+
+		}
+		return orderProductResponseList;
 	}
 
 	public static class OrderForm {
