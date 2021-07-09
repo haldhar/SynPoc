@@ -46,7 +46,7 @@ public class AuthenticationControllerTest {
     @Test
     public void testAuthenticate() throws Exception {
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setUserName("admin");
+        authenticationResponse.setUsername("admin");
         authenticationResponse.setGender("M");
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
         authenticationRequest.setUserName("admin");
