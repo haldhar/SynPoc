@@ -1,12 +1,10 @@
 package com.order.orderdemo.controller.model;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.order.orderdemo.dao.entity.Product;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderProductResponse {

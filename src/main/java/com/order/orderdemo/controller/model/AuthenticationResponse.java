@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(Include.NON_NULL)
 public class AuthenticationResponse {
 
-	@JsonProperty("userName")
-	private String userName;
+	@JsonProperty("username")
+	private String username;
 
 	@JsonProperty("gender")
 	private String gender;
@@ -25,12 +25,12 @@ public class AuthenticationResponse {
 	@JsonProperty("jwtToken")
 	private String jwtToken;
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getGender() {

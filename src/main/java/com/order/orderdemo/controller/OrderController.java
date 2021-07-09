@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,6 @@ import com.order.orderdemo.controller.model.OrderProductResponse;
 import com.order.orderdemo.dao.entity.Order;
 import com.order.orderdemo.dao.entity.OrderProduct;
 import com.order.orderdemo.dao.entity.OrderStatus;
-import com.order.orderdemo.dao.entity.Product;
 import com.order.orderdemo.email.EmailService;
 import com.order.orderdemo.email.model.ConfirmationEmail;
 import com.order.orderdemo.service.OrderProductService;
@@ -47,6 +47,7 @@ public class OrderController {
 	EmailService emailService;
 
 	@PostMapping(path = "/order")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<Order> create(@RequestBody OrderForm orderForm) {
 		List<OrderProduct> formData = orderForm.getProductOrders();
 		validateProductsExistence(formData);
@@ -84,11 +85,12 @@ public class OrderController {
 	}
 
 	@GetMapping(path = "/order")
+	@PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')")
 	public List<OrderProductResponse> getAllOrders() {
 		Iterable<Order> orders = orderService.getAllOrders();
-		List<OrderProductResponse> orderProductResponseList = new ArrayList<OrderProductResponse>();
+		List<OrderProductResponse> orderProductResponseList = new ArrayList<>();
 		for (Order order : orders) {
-			OrderProductResponse orderProductResponse = new OrderProductResponse();
+			var orderProductResponse = new OrderProductResponse();
 			orderProductResponse.setId(order.getId());
 			orderProductResponse.setDateCreated(order.getDateCreated());
 			orderProductResponse.setStatus(order.getStatus());

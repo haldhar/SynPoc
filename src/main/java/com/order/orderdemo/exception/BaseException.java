@@ -38,6 +38,7 @@ public class BaseException extends RuntimeException {
 	 * @return message
 	 *
 	 */
+	@Override
 	public String getMessage() {
 		return message;
 	}

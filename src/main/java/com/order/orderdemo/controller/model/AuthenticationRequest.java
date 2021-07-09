@@ -7,18 +7,18 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class AuthenticationRequest {
 
-	@JsonProperty("userName")
-	private String userName;
+	@JsonProperty("username")
+	private String username;
 	
 	@JsonProperty("password")
 	private String password;
 
 	public String getUserName() {
-		return userName;
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserName(String username) {
+		this.username = username;
 	}
 
 	public String getPassword() {

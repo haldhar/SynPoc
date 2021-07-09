@@ -7,11 +7,14 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -25,6 +28,7 @@ public class JwtTokenUtil implements Serializable {
 
 	static final String CLAIM_KEY_USERNAME = "sub";
 	static final String CLAIM_KEY_CREATED = "created";
+	static final String CLAIM_KEY_ROLES = "Roles";
 
 	@Value("${jwt.secret}")
 	private String fileName;
@@ -39,10 +43,14 @@ public class JwtTokenUtil implements Serializable {
 	 * 
 	 * @return
 	 */
-	public String generateToken(String userName) {
+	public String generateToken(String userName, UserDetails userDetails) {
+
+		final String authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+				.collect(Collectors.joining(","));
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(CLAIM_KEY_USERNAME, userName);
 		claims.put(CLAIM_KEY_CREATED, new Date());
+		claims.put(CLAIM_KEY_ROLES, authorities);
 		return generateToken(claims);
 	}
 
@@ -55,8 +63,8 @@ public class JwtTokenUtil implements Serializable {
 
 	public Boolean validateToken(String token) {
 		try {
-			final String username = getUsernameFromToken(token);			
-			return (username!=null && !isTokenExpired(token));
+			final String username = getUsernameFromToken(token);
+			return (username != null && !isTokenExpired(token));
 		} catch (Exception e) {
 			return false;
 		}
